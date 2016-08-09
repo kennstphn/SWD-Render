@@ -61,7 +61,12 @@ Templates can be defined (as a default) within a class itself by assigning a str
 >3. The object itself for a 'template' property. 
 >4. If no template is found, a User Notice level error is thrown to the `\SWD\Render::render()`'s caller.
 
-Once the template string has been defined, `\SWD\Render::render()` grabs all {{placeholder}} patterns, and looks for a property with that pattern (minus the brackets), then method if no property is found. Recursion then kicks in, and `\SWD\Render::render()` is then called again and passed the evaluated property or method. Nested Objects are thus rendered as long as (they have a template) and (they are called by the parent object's template).
+Once the template string has been defined, `\SWD\Render::render()` grabs all {{placeholder}} patterns within the template string, and replaces it with the first option from the following list that applies.
+
+1. A property with that pattern (minus the brackets) 
+2. A method from that object with the pattern as it's name. 
+
+Rendering Recursion then kicks in, and `\SWD\Render::render()` is then called again and passed the evaluated property or method. Nested Objects, Arrays, and strings are thus rendered as long as (they are called by the parent object's template) and (objects have a template).
 
 > NOTE: You can call `\SWD\Render::render($object);` on objects that are from other developers. Since templates assigned via the global $swdTemplates override (not replace) the $object->template property, no class/object hacking is necessary to non-destructively access the public properties/methods of the object;
 
@@ -72,10 +77,10 @@ Once the template string has been defined, `\SWD\Render::render()` grabs all {{p
 
 ###Arrays
 
-\SWD\Render handles arrays as a "foreach" loop, concatenating the results of `\SWD\Render::render($eachItem);` into a string. If you want to conditionalize this loop, then you want logic. If you want logic, then you should do one of the following
+As just mentioned, \SWD\Render handles arrays as a "foreach" loop, rendering each value. If you want to conditionalize this loop, then you want logic. If you want logic, then you should do one of the following
 
-1. look to php as your solution (create a class with method `public function method_that_returns_filtered_array(){};` for your object, and use {{method_that_returns_filtered_array}} in your template string)
-2. look to javascript as your solution
+1. look to php as your solution (i.e. create a class with method `public function method_that_returns_filtered_array(){};` for your object, and use {{method_that_returns_filtered_array}} in your template string)
+2. look to javascript as your solution 
 3. Use a templating engine that includes logic
 
 
