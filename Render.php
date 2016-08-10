@@ -39,7 +39,7 @@ class Render
 
 
         //CONTROLLER 
-        switch ($mytype =self::get_type($object)){
+        switch ($mytype = self::get_type($object)){
             case 'string':
             case 'integer':
             case 'null':
@@ -222,7 +222,7 @@ class Render
                     method_exists($object, $placeholder)
                     && is_callable(array($object, $placeholder))
                 ){
-                    return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder(), $allTemplates), $template);
+                    return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder($allTemplates), $allTemplates), $template);
                 }
 
                 break;
