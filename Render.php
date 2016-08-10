@@ -18,7 +18,7 @@ class Render
      * ***************************************************************** *
      *********************************************************************
      */
-    protected static $version = '1.0';
+    protected static $version = '1.1';
 
     static function get_version($asString = true){
         if ($asString == true){return self::$version;}
@@ -26,7 +26,7 @@ class Render
         throw new \Exception('non-boolean value passed to get_version');
     }
 
-    static function render($object){
+    static function render($object, $allTemplates){
 
         /*
          * This function should only ever return
@@ -38,7 +38,7 @@ class Render
         $emptyString = '';
 
 
-        //CONTROLLER
+        //CONTROLLER 
         switch ($mytype =self::get_type($object)){
             case 'string':
             case 'integer':
@@ -49,17 +49,17 @@ class Render
             case 'array':
                 $output = '';
                 foreach($object as $arrayItem){
-                    $output .= \SWD\Render::render($arrayItem);
+                    $output .= \SWD\Render::render($arrayItem, $allTemplates);
                 }
                 break;
             case 'object':
                 // Checks for overrides, then default ->template string
                 // notify if template
-                try{ $template = self::load_template($object); }
+                try{ $template = self::load_template($object, $allTemplates); }
                 catch (\Exception $ex) { trigger_error($ex->getMessage(), E_USER_NOTICE); return $emptyString; }
 
                 //replace the temmplate {{placeholders}} with values
-                try{ $output = self::propogate_values_to_placeholders($template, $object); }
+                try{ $output = self::propogate_values_to_placeholders($template, $object, $allTemplates); }
                 catch (\Exception $ex) { trigger_error($ex->getMessage(), E_USER_NOTICE); return $emptyString;}
 
                 break;
@@ -69,7 +69,7 @@ class Render
         }
         return $output;
     }
-    
+
     protected static function get_type($incoming){
         if (is_string($incoming)){return 'string';}
         if (is_array($incoming)){return 'array';}
@@ -81,21 +81,21 @@ class Render
         throw new \Exception('Invalid type "'.gettype($incoming).'" passed to \SWD\Render');
     }
 
-    protected static function load_template($object){
+    protected static function load_template($object, $allTemplates){
 
         // check for a template override
-        $template = self::get_template_override($object);
+        $template = self::get_template_override($object, $allTemplates);
 
         // If we don't have a template override set,
         // look for the default template property
         if ($template == false){ $template = self::get_template_default($object); }
 
         // at this point, dump out - we're not doing anything with this.
-        // design docs define this error into a notice. 
+        // design docs define this error into a notice.
         if ($template == false){ throw new \Exception('Missing template property for passed Object of class '. get_class($object));}
         return $template;
     }
-    
+
     protected static function get_template_default($object){
 
 
@@ -103,32 +103,56 @@ class Render
             isset($object->template)
             && is_string($object->template)
         ){
-        
+
             return $object->template;
         }
         return false;
     }
 
-    protected static function get_template_override($object){
+    protected static function get_template_override($object, $allTemplates){
 
-        global $swdTemplates;
         $classOfObject = get_class($object);
-        $templateStringOrObjectWith_get_template_method = str_replace('\\', '_', $classOfObject);
-        
-        if (
-            isset($swdTemplates->$templateStringOrObjectWith_get_template_method)
-            && is_string($swdTemplates->$templateStringOrObjectWith_get_template_method)
-        ){
-            return $swdTemplates->$templateStringOrObjectWith_get_template_method;
-        }
 
-        if(
-            isset($swdTemplates->$templateStringOrObjectWith_get_template_method)
-            && is_object($swdTemplates->$templateStringOrObjectWith_get_template_method)
-        ){
-            return $swdTemplates->$templateStringOrObjectWith_get_template_method->get_template($object);
-        }
+        switch (self::get_type($allTemplates)){
+            case 'object':
+                if (isset($allTemplates->$classOfObject)){
+                    return $allTemplates->$classOfObject;
+                }
+                if (
+                    method_exists($allTemplates, '__get')
+                    && is_callable(array($allTemplates, '__get'))
+                    && is_string( $string = $allTemplates->$classOfObject)
+                ){
+                    return $string;
+                }
 
+                // Additional option for controller in the event that ppl don't want to use
+                // Magic Method __get(); TODO test this for object passing vs not
+                $underscoredClassName_with_prepended  = 'get_template_for_'.str_replace('\\','_',$classOfObject);
+                if (
+                    method_exists($allTemplates, $underscoredClassName_with_prepended)
+                    && is_callable(array($allTemplates,$underscoredClassName_with_prepended))
+                    && is_string( $string = $allTemplates->$underscoredClassName_with_prepended($object))
+                ){
+                    return $string;
+                }
+                break;
+            case 'array':
+                if(
+                    array_key_exists($classOfObject, $allTemplates)
+                    && is_string($allTemplates[$classOfObject])
+                ){
+                    return $allTemplates[$classOfObject];
+                }
+                return false;
+                break;
+            case 'string':
+                return $allTemplates;
+                break;
+            default:
+                return false;
+                break;
+        }
         return false;
     }
 
@@ -145,7 +169,7 @@ class Render
         if ($numberOfMatches === 0){ throw new \Exception('No placeholders found in template. Rendering template as-is');}
     }
 
-    protected static function replace_placeholder_with_string($template, $placeholder, $object){
+    protected static function replace_placeholder_with_string($template, $placeholder, $object, $allTemplates){
 
         switch (isset($object->$placeholder)){
 
@@ -160,12 +184,12 @@ class Render
                 $type = self::get_type($object->$placeholder);
                 switch($type){
                     case 'object':
-                        return str_replace('{{'.$placeholder.'}}',\SWD\Render::render($object->$placeholder), $template);
+                        return str_replace('{{'.$placeholder.'}}',\SWD\Render::render($object->$placeholder, $allTemplates), $template);
                         break;
                     case 'array':
                         $arrayOfStrings = array() ;
                         foreach($object->$placeholder as $item){
-                            array_push($arrayOfStrings, \SWD\Render::render($item));
+                            array_push($arrayOfStrings, \SWD\Render::render($item, $allTemplates));
                         }
                         return str_replace('{{'.$placeholder.'}}', implode(' ',$arrayOfStrings) , $template);
                         break;
@@ -190,7 +214,7 @@ class Render
                     method_exists($object, $placeholder)
                     && is_callable(array($object, $placeholder))
                 ){
-                        return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder()), $template);
+                    return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder(), $allTemplates), $template);
                 }
 
                 break;
@@ -200,14 +224,13 @@ class Render
         return $template;
     }
 
-    protected static function propogate_values_to_placeholders($template, $object){
-        if (!isset($int)){$int = 0;}
+    protected static function propogate_values_to_placeholders($template, $object, $allTemplates){
 
         self::extract_placeholders($template, $placeholderList);
 
         foreach($placeholderList as $placeholder){
 
-            $template = self::replace_placeholder_with_string($template, $placeholder, $object);
+            $template = self::replace_placeholder_with_string($template, $placeholder, $object, $allTemplates);
 
         }
 
