@@ -93,4 +93,10 @@ if `\SWD\Render::render();` is called on a string, it returns the string as is. 
 
 ###Methods
 
-This section allows templating logic that does not conflict with our design scope! If you need the result of a function in your template, simply call that function from within the template string as {{your_method_name}}. This is replaced by the result of your function, whether it be a string, another Object (define a template in your $allTemplates variable!) or even an arrayOfStringsAndOrObjects. This becomes a highly powerful tool that enables sophisticated templating, while never once allowing markup language to become logical language. 
+This section allows templating logic that does not conflict with our design scope! If you need the result of a function in your template, simply call that function from within the template string as {{your_method_name}}. This is replaced by the result of your function, whether it be a string, another Object (define a template in your $allTemplates variable!) or even an arrayOfStringsAndOrObjects. This becomes a highly powerful tool that enables sophisticated templating, while never once allowing markup language to become logical language.
+
+>NOTE: the method is passed the $allTemplates object/array/whateveryoupassedInOriginally. You can use this to flip switches in your controller as desired by 
+
+> 1. Calling a public function in your template (i.e. {{use_controller}})
+> 2. accepting the passed variable like so -- `public function use_controller($controller){}` in your rendered object. 
+> 3. dont forget that you can propogate the changes back up the chain of reference to other templates by using an ampersand in your function declaration
