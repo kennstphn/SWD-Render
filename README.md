@@ -1,5 +1,15 @@
 # SWD-Render
 
+####INDEX
+#####Scope
+#####Implementation
+######Templates
+#######Placeholders
+#######Template Defining
+######Objects
+######Arrays
+######Strings
+######Methods
 
 ##Scope
 
