@@ -37,16 +37,17 @@ When `\SWD\Render::render()` is passed an object and template variable, it looks
   1. If the $allTemplates variable is an object, it looks for the template string in these places (stops when it finds one)
    1. The `$allTemplates->Your\Name\Spaced\ClassName` property which is a string
    2. The result of $allTemplates->__get($YourObjectsClassName)
-   3. The result of $allTemplates->get_template_for_Your_Name_Spaced_ClassName($YourObject) (this is for people who don't like magic methods...
+   3. The result of $allTemplates->__call($YourObjectsClassName, $YourObject)
+   3. The result of $allTemplates->get_template_for_Your_Name_Spaced_ClassName($YourObject)
   2. If the $allTemplates variable is an array, it looks at $allTemplates['Your\Name\Spaced\ClassName'];
   3. if the $allTemplates variable is a string, we use that. 
   4. booleans, integers, etc are ignored.
 3. The object itself for a 'template' property. i.e. `$yourObject->template`
 4. If no template is found, a User Notice level error is thrown to the `\SWD\Render::render()`'s caller, and code continues running.
 
-BEGINNERS -- Beginners are suggested to use 1.ii and 1.iii until you understand controllers and want to get into that logic
-MVC Programmers -- You can see how this allows clear access to a MVC model using the  `\SWD\Render::render($application,  $yourController)` method. 
+>BEGINNERS -- Beginners are suggested to use 1.ii and 1.iii until you understand controllers and want to get into that logic
 
+>MVC Programmers -- You can see how this allows clear access to a MVC model using the  `\SWD\Render::render($application,  $yourController)` style, especially by 1 -implementing a controller in the `$allTemplates->__call($classname, $object)`, joined with being able to nest objects for rendering their own templates conditionally. (see section on Methods below)
 
 ####Placeholders
 
