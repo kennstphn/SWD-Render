@@ -126,8 +126,16 @@ class Render
                     return $string;
                 }
 
+                if (
+                    method_exists($allTemplates, '__call')
+                    && is_callable(array($allTemplates, '__call'))
+                    && is_string($string = $allTemplates->$classOfObject($object))
+                ){
+                    return $string;
+                }
+
                 // Additional option for controller in the event that ppl don't want to use
-                // Magic Method __get(); TODO test this for object passing vs not
+                // Magic Methods
                 $underscoredClassName_with_prepended  = 'get_template_for_'.str_replace('\\','_',$classOfObject);
                 if (
                     method_exists($allTemplates, $underscoredClassName_with_prepended)
