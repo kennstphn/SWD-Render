@@ -1,0 +1,19 @@
+{
+    "name": "swd/render",
+    "type": "library",
+    "description": "Rendering Engine for rendering objects into templates",
+    "keywords": ["render","oop","MVC","template","templating"],
+    "homepage": "https://github.com/kennstphn/SWD-Render",
+    "license": "WTFPL",
+    "authors": [
+        {
+            "name": "Ken Sherman",
+            "email": "ken@shermanwebdesign.com",
+            "homepage": "http://shermanwebdesign.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
