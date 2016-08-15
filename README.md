@@ -25,7 +25,7 @@ Scope
 
 The scope of this project is to create a templating solution that conforms to the following standards
 
-1. Usage must be simple!
+1. Usage must be simple
  1. The implementation must not require extra libraries, rely on other languages, etc
  2. Calling the method must not require lots of variables, or arrays of configs
  3. Recursion and looping must be supported in a way that doesn't depend on hacking existing classes for objects
