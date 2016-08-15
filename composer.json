@@ -1,5 +1,5 @@
 {
-    "name": "SWD/render",
+    "name": "shermanwebdesign/render",
     "type": "library",
     "description": "Rendering Engine for rendering objects into templates",
     "keywords": ["render","oop","MVC","template","templating"],
