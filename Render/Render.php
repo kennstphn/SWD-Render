@@ -78,7 +78,7 @@ class Render
         if (is_null($incoming)){return 'null';}
         if (is_int($incoming)){return 'integer';}
         if (is_bool($incoming)){return 'boolean';}
-        if (is_float)($incoming){return 'float';}
+        if (is_float($incoming)){return 'float';}
 
         throw new \Exception('Invalid type "'.gettype($incoming).'" passed to \SWD\Render');
     }
