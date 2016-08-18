@@ -42,6 +42,7 @@ class Render
         switch ($mytype = self::get_type($object)){
             case 'string':
             case 'integer':
+            case 'float':
             case 'null':
                 $output = (string)$object;
 
@@ -77,6 +78,7 @@ class Render
         if (is_null($incoming)){return 'null';}
         if (is_int($incoming)){return 'integer';}
         if (is_bool($incoming)){return 'boolean';}
+        if (is_float)($incoming){return 'float';}
 
         throw new \Exception('Invalid type "'.gettype($incoming).'" passed to \SWD\Render');
     }
