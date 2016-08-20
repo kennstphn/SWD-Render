@@ -215,16 +215,22 @@ class Render
 
             /*
              *
-             * This section deals with functions
+             * This section deals with functions and __get()
              *
              */
-            case false:
+              case false:
 
                 if (
                     method_exists($object, $placeholder)
                     && is_callable(array($object, $placeholder))
                 ){
                     return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder($allTemplates), $allTemplates), $template);
+                }
+
+                if(
+                    method_exists($object,'__get')
+                ){
+                    return str_replace('{{' . $placeholder . '}}',self::render($object->$placeholder, $allTemplates), $template);
                 }
 
                 break;
