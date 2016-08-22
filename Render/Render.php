@@ -19,6 +19,7 @@ class Render
      *********************************************************************
      */
     protected static $version = '1.1';
+    public static $arrayImplodeSeparator = ' ';
 
     static function get_version($asString = true){
         if ($asString == true){return self::$version;}
@@ -201,7 +202,7 @@ class Render
                         foreach($object->$placeholder as $item){
                             array_push($arrayOfStrings, \SWD\Render::render($item, $allTemplates));
                         }
-                        return str_replace('{{'.$placeholder.'}}', implode(' ',$arrayOfStrings) , $template);
+                        return str_replace('{{'.$placeholder.'}}', implode(self::$arrayImplodeSeparator,$arrayOfStrings) , $template);
                         break;
                     case 'string':
                     case 'null':
